@@ -12,6 +12,7 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 
+/*
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
@@ -54,6 +55,7 @@ var requestHandler = function(request, response) {
   // node to actually send all the data over to the client.
   response.end('Hello, World!');
 };
+*/
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
 // This code allows this server to talk to websites that
@@ -62,7 +64,7 @@ var requestHandler = function(request, response) {
 // Your chat client is running from a url like file://your/chat/client/index.html,
 // which is considered a different domain.
 //
-// Another way to get around this restriction is to serve you chat
+// Another way to get around this requestriction is to serve you chat
 // client from this domain by setting up static file serving.
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -71,3 +73,17 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
+var requestHandler = function(request, response) {
+  console.log('Serving request type ' + request.method + ' for url ' + request.url);
+  var headers = defaultCorsHeaders;
+
+  if (request.method === 'GET') {
+    var statusCode = 200;
+    response.writeHead(statusCode, headers);
+    response.end('Hello, World!');
+  }
+};
+
+module.exports = {
+  requestHandler: requestHandler
+};
