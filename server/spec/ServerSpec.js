@@ -71,8 +71,11 @@ describe('Node Server Request Listener Function', function() {
 
     // Testing for a newline isn't a valid test
     // TODO: Replace with with a valid test
-    // expect(res._data).to.equal(JSON.stringify('\n'));
+    var parsedBody = JSON.parse(res._data);
     expect(res._ended).to.equal(true);
+    expect(parsedBody.results).to.be.an('array');
+    expect(parsedBody.results).to.exist;
+    expect(parsedBody.results[0].username).to.equal('Jono');
   });
 
   it('Should respond with messages that were previously posted', function() {
@@ -84,9 +87,7 @@ describe('Node Server Request Listener Function', function() {
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
-
     expect(res._responseCode).to.equal(201);
-
       // Now if we request the log for that room the message we posted should be there:
     req = new stubs.request('/classes/messages', 'GET');
     res = new stubs.response();
@@ -95,6 +96,7 @@ describe('Node Server Request Listener Function', function() {
 
     expect(res._responseCode).to.equal(200);
     var messages = JSON.parse(res._data).results;
+    var parsedBody = JSON.parse(res._data);
     expect(messages.length).to.be.above(0);
     expect(messages[0].username).to.equal('Jono');
     expect(messages[0].message).to.equal('Do my bidding!');
