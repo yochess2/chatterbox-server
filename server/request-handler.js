@@ -24,40 +24,42 @@ var data = {
   results: []
 };
 
+var routes = {
+  '/classes/messages': handleMessages,
+};
 
 var requestHandler = function(request, response) {
-  var writeResponse = function(statusCode, headers) {
-    response.writeHead(statusCode, headers);
-    response.end(JSON.stringify(data));
-  };
-
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
-  var statusCode;
-  var headers = defaultCorsHeaders;
 
-  if (request.method === 'GET') {
-    statusCode = 200;
-    writeResponse(200, headers);
-
-  } else if (request.method === 'POST') {
-    statusCode = 201;
-    request.on('data', function(incoming) {
-      data.results.push(JSON.parse(incoming));
-    });
-    request.on('end', function() {
-      writeResponse(statusCode, headers);
-    });
-
-  } else if (request.method === 'PUT') {
-
-  } else if (request.method === 'OPTIONS') {
-
+  if (routes[request.url]) {
+    routes[request.url](request, response);
   } else {
-    statusCode = 404;
-    writeResponse(statusCode, headers);
+    handle404(request, response);
   }
 };
 
 module.exports = {
   requestHandler: requestHandler
 };
+
+function handleMessages(request, response) {
+  if (request.method === 'GET') {
+    response.writeHead(200, defaultCorsHeaders);
+    response.end(JSON.stringify(data));
+  } else if (request.method === 'POST') {
+    request.on('data', function(incoming) {
+      data.results.push(JSON.parse(incoming));
+    });
+    request.on('end', function() {
+      response.writeHead(201, defaultCorsHeaders);
+      response.end(JSON.stringify(data));
+    });
+  } else {
+    console.log('not possible');
+  }
+}
+
+function handle404(request, response) {
+  response.writeHead(404, defaultCorsHeaders);
+  response.end();
+}
