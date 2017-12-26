@@ -23,6 +23,7 @@ module.exports = {
     this.method = method;
     this._postData = postdata;
     this.setEncoding = function() { /* noop */ };
+    this.headers = [];
 
     this.addListener = this.on = function(type, callback) {
       if (type === 'data') {
